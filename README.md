@@ -8,12 +8,10 @@ Employee churn risk prediction system, featuring an interactive dashboard and au
 | Layer | Tool |
 | --- | --- |
 | ML model | XGBoost + scikit-learn |
-| Narrative LLM | Ollama (local) / Groq API (production) |
+| Narrative LLM | Choose between LLMs |
 | Dashboard | Streamlit |
 | PDF Report | ReportLab |
 | Excel Report | openpyxl |
-| Deploy | Streamlit Cloud (free) |
-
 
 ## Project structure
 
