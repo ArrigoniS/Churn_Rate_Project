@@ -1,0 +1,133 @@
+{
+  "columns": {
+    "employee_id": {
+      "type": "str",
+      "role": "id",
+      "desc": "ID univoco dipendente"
+    },
+    "nome": {
+      "type": "str",
+      "role": "pii",
+      "desc": "Nome"
+    },
+    "cognome": {
+      "type": "str",
+      "role": "pii",
+      "desc": "Cognome"
+    },
+    "data_assunzione": {
+      "type": "str",
+      "role": "pii",
+      "desc": "Data assunzione (YYYY-MM-DD)"
+    },
+    "eta": {
+      "type": "int",
+      "role": "feature",
+      "min": 18,
+      "max": 70,
+      "desc": "Età in anni"
+    },
+    "dipartimento": {
+      "type": "str",
+      "role": "feature",
+      "categorical": true,
+      "desc": "Dipartimento"
+    },
+    "ruolo": {
+      "type": "str",
+      "role": "feature",
+      "categorical": true,
+      "desc": "Ruolo aziendale"
+    },
+    "anni_in_azienda": {
+      "type": "float",
+      "role": "feature",
+      "min": 0,
+      "max": 50,
+      "desc": "Anni dall'assunzione"
+    },
+    "stipendio_annuo": {
+      "type": "int",
+      "role": "feature",
+      "min": 15000,
+      "max": 500000,
+      "desc": "RAL in euro"
+    },
+    "num_promozioni": {
+      "type": "int",
+      "role": "feature",
+      "min": 0,
+      "max": 20,
+      "desc": "Promozioni ricevute"
+    },
+    "anni_senza_promozione": {
+      "type": "float",
+      "role": "feature",
+      "min": 0,
+      "max": 30,
+      "desc": "Anni dall'ultima promozione"
+    },
+    "crescita_stipendio_percentuale": {
+      "type": "float",
+      "role": "feature",
+      "min": -20,
+      "max": 50,
+      "desc": "Crescita % stipendio annua"
+    },
+    "ore_settimanali_medie": {
+      "type": "float",
+      "role": "feature",
+      "min": 20,
+      "max": 80,
+      "desc": "Ore lavorate/settimana"
+    },
+    "giorni_ultimo_checkin_hr": {
+      "type": "int",
+      "role": "feature",
+      "min": 0,
+      "max": 730,
+      "desc": "Giorni fa dall'ultimo check-in HR"
+    },
+    "manager_score": {
+      "type": "float",
+      "role": "feature",
+      "min": 1,
+      "max": 10,
+      "desc": "Score feedback manager (1-10)"
+    },
+    "enps_score": {
+      "type": "float",
+      "role": "feature",
+      "min": 1,
+      "max": 10,
+      "desc": "Employee NPS (1-10)"
+    },
+    "giorni_assenza_anno": {
+      "type": "int",
+      "role": "feature",
+      "min": 0,
+      "max": 365,
+      "desc": "Giorni assenza nell'anno"
+    },
+    "num_progetti_anno": {
+      "type": "int",
+      "role": "feature",
+      "min": 0,
+      "max": 50,
+      "desc": "Progetti seguiti nell'anno"
+    },
+    "ferie_residue": {
+      "type": "int",
+      "role": "feature",
+      "min": 0,
+      "max": 60,
+      "desc": "Giorni ferie residui"
+    },
+    "churn_label": {
+      "type": "int",
+      "role": "target",
+      "desc": "0 = resta, 1 = a rischio"
+    }
+  },
+  "custom_columns": {}
+}
