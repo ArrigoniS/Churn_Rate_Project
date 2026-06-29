@@ -12,7 +12,7 @@ import streamlit as st
 
 def get_lang() -> str:
     """Restituisce la lingua attiva ('it' o 'en')."""
-    return st.session_state.get("lang", "it")
+    return st.session_state.get("lang", "en")
 
 
 def t(key: str) -> str:
