@@ -154,8 +154,8 @@ TEXTS = {
     "cta_dataset_ready_sub":{"it": "Il dataset è caricato. Vai su Training per addestrare il modello.",
                              "en": "The dataset is loaded. Go to Training to train the model."},
     "cta_start":            {"it": "Inizia da qui",            "en": "Start here"},
-    "cta_start_sub":        {"it": "Nessun dato ancora. Vai su Configurazione per generare o caricare un dataset.",
-                             "en": "No data yet. Go to Configuration to generate or upload a dataset."},
+    "cta_start_sub":        {"it": "Modello di default Caricato. Nessun dato custom creato. Vai su Configurazione per generare o caricare un dataset. Vai su Analysis per utilizzare il modello di default con dati custom.",
+                             "en": "Default Model Ready. No custom data yet. Go to Configuration to generate or upload a dataset. Go to Analysis to directly use the default model with custom data."},
     "cta_nav_hint":         {"it": "Usa il menu laterale ☰ in alto a sinistra per navigare tra le pagine",
                              "en": "Use the sidebar menu ☰ top left to navigate between pages"},
 
