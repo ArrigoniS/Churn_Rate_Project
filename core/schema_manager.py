@@ -51,17 +51,20 @@ COLUMN_ROLES   = ["feature", "id", "pii", "target", "ignore"]
 # ─────────────────────────────────────────────
 
 def load_schema() -> dict:
-    """Carica lo schema da file. Se non esiste, restituisce il default."""
+    """Carica lo schema da file. Se non esiste o e corrotto, restituisce il default."""
     if os.path.exists(CONFIG_PATH):
-        with open(CONFIG_PATH, "r") as f:
-            return json.load(f)
+        try:
+            with open(CONFIG_PATH, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except (json.JSONDecodeError, UnicodeDecodeError, OSError):
+            pass
     return {"columns": DEFAULT_COLUMNS.copy(), "custom_columns": {}}
 
 
 def save_schema(schema: dict):
     """Salva lo schema su file."""
     os.makedirs(os.path.dirname(CONFIG_PATH), exist_ok=True)
-    with open(CONFIG_PATH, "w") as f:
+    with open(CONFIG_PATH, "w", encoding="utf-8") as f:
         json.dump(schema, f, indent=2, ensure_ascii=False)
 
 
