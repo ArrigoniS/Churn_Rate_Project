@@ -199,16 +199,8 @@ def train(
         "model_params":      default_params,
     }
 
-    # ── Salva artefatti ──
-    joblib.dump(model,       f"{MODEL_DIR}/churn_model.pkl")
-    joblib.dump(encoders,    f"{MODEL_DIR}/encoders.pkl")
-    joblib.dump(feature_cols,f"{MODEL_DIR}/feature_cols.pkl")
-    with open(f"{MODEL_DIR}/metrics.json", "w") as f:
-        json.dump(metrics, f, indent=2)
-    with open(f"{MODEL_DIR}/feature_importance.json", "w") as f:
-        json.dump(importance, f, indent=2)
-
-    return {
+    # ── Salva artefatti in session_state (isolato per utente) ──
+    artifacts = {
         "model":         model,
         "encoders":      encoders,
         "feature_cols":  feature_cols,
@@ -219,9 +211,37 @@ def train(
         "y_proba":       y_proba,
     }
 
+    import streamlit as st
+    st.session_state["training_artifacts"] = artifacts
+
+    # Backup su disco (solo locale, ignorato se fallisce)
+    try:
+        os.makedirs(MODEL_DIR, exist_ok=True)
+        joblib.dump(model,        f"{MODEL_DIR}/churn_model.pkl")
+        joblib.dump(encoders,     f"{MODEL_DIR}/encoders.pkl")
+        joblib.dump(feature_cols, f"{MODEL_DIR}/feature_cols.pkl")
+        with open(f"{MODEL_DIR}/metrics.json", "w") as f:
+            json.dump(metrics, f, indent=2)
+        with open(f"{MODEL_DIR}/feature_importance.json", "w") as f:
+            json.dump(importance, f, indent=2)
+    except OSError:
+        pass
+
+    return artifacts
+
 
 def load_training_artifacts() -> dict | None:
-    """Carica gli artefatti di training salvati su disco."""
+    """
+    Carica gli artefatti di training da st.session_state (isolato per utente).
+    Fallback: disco locale (solo sviluppo).
+    """
+    import streamlit as st
+
+    # Prima cerca in session_state
+    if "training_artifacts" in st.session_state and st.session_state["training_artifacts"]:
+        return st.session_state["training_artifacts"]
+
+    # Fallback su disco (solo locale)
     required = [
         f"{MODEL_DIR}/churn_model.pkl",
         f"{MODEL_DIR}/encoders.pkl",
@@ -231,18 +251,21 @@ def load_training_artifacts() -> dict | None:
     if not all(os.path.exists(p) for p in required):
         return None
 
-    with open(f"{MODEL_DIR}/metrics.json") as f:
-        metrics = json.load(f)
-
-    importance = {}
-    if os.path.exists(f"{MODEL_DIR}/feature_importance.json"):
-        with open(f"{MODEL_DIR}/feature_importance.json") as f:
-            importance = json.load(f)
-
-    return {
-        "model":        joblib.load(f"{MODEL_DIR}/churn_model.pkl"),
-        "encoders":     joblib.load(f"{MODEL_DIR}/encoders.pkl"),
-        "feature_cols": joblib.load(f"{MODEL_DIR}/feature_cols.pkl"),
-        "metrics":      metrics,
-        "importance":   importance,
-    }
+    try:
+        with open(f"{MODEL_DIR}/metrics.json") as f:
+            metrics = json.load(f)
+        importance = {}
+        if os.path.exists(f"{MODEL_DIR}/feature_importance.json"):
+            with open(f"{MODEL_DIR}/feature_importance.json") as f:
+                importance = json.load(f)
+        artifacts = {
+            "model":        joblib.load(f"{MODEL_DIR}/churn_model.pkl"),
+            "encoders":     joblib.load(f"{MODEL_DIR}/encoders.pkl"),
+            "feature_cols": joblib.load(f"{MODEL_DIR}/feature_cols.pkl"),
+            "metrics":      metrics,
+            "importance":   importance,
+        }
+        st.session_state["training_artifacts"] = artifacts
+        return artifacts
+    except Exception:
+        return None

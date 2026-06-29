@@ -8,7 +8,7 @@ import json
 import os
 from typing import Any
 
-CONFIG_PATH = "config/schema.json"
+CONFIG_PATH = "config/schema.json"  # usato solo in locale, ignorato su Cloud
 
 # ─────────────────────────────────────────────
 # SCHEMA DI DEFAULT
@@ -51,26 +51,51 @@ COLUMN_ROLES   = ["feature", "id", "pii", "target", "ignore"]
 # ─────────────────────────────────────────────
 
 def load_schema() -> dict:
-    """Carica lo schema da file. Se non esiste o e corrotto, restituisce il default."""
+    """
+    Legge lo schema da st.session_state (isolato per sessione utente).
+    Fallback: disco locale (sviluppo) o default.
+    """
+    import streamlit as st
+    if "schema" in st.session_state and st.session_state["schema"]:
+        return st.session_state["schema"]
+    # Fallback locale (solo dev)
     if os.path.exists(CONFIG_PATH):
         try:
             with open(CONFIG_PATH, "r", encoding="utf-8") as f:
-                return json.load(f)
+                schema = json.load(f)
+                st.session_state["schema"] = schema
+                return schema
         except (json.JSONDecodeError, UnicodeDecodeError, OSError):
             pass
-    return {"columns": DEFAULT_COLUMNS.copy(), "custom_columns": {}}
+    default = {"columns": DEFAULT_COLUMNS.copy(), "custom_columns": {}}
+    st.session_state["schema"] = default
+    return default
 
 
 def save_schema(schema: dict):
-    """Salva lo schema su file."""
-    os.makedirs(os.path.dirname(CONFIG_PATH), exist_ok=True)
-    with open(CONFIG_PATH, "w", encoding="utf-8") as f:
-        json.dump(schema, f, indent=2, ensure_ascii=False)
+    """
+    Salva lo schema in st.session_state (isolato per sessione).
+    In locale salva anche su disco come backup.
+    """
+    import streamlit as st
+    st.session_state["schema"] = schema
+    try:
+        os.makedirs(os.path.dirname(CONFIG_PATH), exist_ok=True)
+        with open(CONFIG_PATH, "w", encoding="utf-8") as f:
+            json.dump(schema, f, indent=2, ensure_ascii=False)
+    except OSError:
+        pass  # su Cloud il disco potrebbe essere read-only
 
 
 def reset_schema():
     """Ripristina lo schema di default."""
-    save_schema({"columns": DEFAULT_COLUMNS.copy(), "custom_columns": {}})
+    import streamlit as st
+    default = {"columns": DEFAULT_COLUMNS.copy(), "custom_columns": {}}
+    st.session_state["schema"] = default
+    try:
+        save_schema(default)
+    except Exception:
+        pass
 
 
 # ─────────────────────────────────────────────

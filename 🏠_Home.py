@@ -97,9 +97,9 @@ header[data-testid="stHeader"] { background:var(--bg) !important; border-bottom:
 """, unsafe_allow_html=True)
 
 # ── Stato progetto ──
-has_dataset = os.path.exists("data/hr_dataset.csv")
-has_model   = os.path.exists("models/churn_model.pkl")
-has_scored  = os.path.exists("data/hr_scored.csv")
+has_dataset = (st.session_state.get("df_train_raw") is not None or os.path.exists("data/hr_dataset.csv"))
+has_model   = (st.session_state.get("training_artifacts") is not None or os.path.exists("models/churn_model.pkl"))
+has_scored  = (st.session_state.get("df_scored") is not None or os.path.exists("data/hr_scored.csv"))
 
 # ── HERO ──
 st.markdown(f"""
