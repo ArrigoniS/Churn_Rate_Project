@@ -28,7 +28,7 @@ def render_lang_toggle():
     """
     with st.sidebar:
         st.markdown("---")
-        lang = st.session_state.get("lang", "it")
+        lang = st.session_state.get("lang", "en")
         choice = st.radio(
             "🌐 Language / Lingua",
             options=["🇮🇹 Italiano", "🇬🇧 English"],
@@ -37,7 +37,7 @@ def render_lang_toggle():
             horizontal=True,
             label_visibility="collapsed",
         )
-        new_lang = "it" if "Italiano" in choice else "en"
+        new_lang = "en" if "English" in choice else "it"
         if new_lang != lang:
             st.session_state["lang"] = new_lang
             st.rerun()
