@@ -104,7 +104,7 @@ with col_config:
                     "learning_rate":learning_rate,"subsample":subsample}
 
     st.markdown("---")
-    df_ready = os.path.exists("data/hr_dataset.csv")
+    df_ready = (st.session_state.get("df_train_raw") is not None or os.path.exists("data/hr_dataset.csv"))
     if not df_ready:
         st.error(t("trn_no_dataset"))
     else:
@@ -128,7 +128,12 @@ if train_btn and df_ready:
     with col_results:
         progress = st.progress(0, text=t("trn_loading"))
         try:
-            df = pd.read_csv("data/hr_dataset.csv")
+            df = st.session_state.get("df_train_raw")
+            if df is None and os.path.exists("data/hr_dataset.csv"):
+                df = pd.read_csv("data/hr_dataset.csv")
+            if df is None:
+                st.error(t("trn_no_dataset"))
+                st.stop()
             progress.progress(15, text=t("trn_preparing"))
             progress.progress(30, text=t("trn_cv"))
             result = train(df=df, schema=schema, feature_weights=feature_weights,

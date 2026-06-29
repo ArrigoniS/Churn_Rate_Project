@@ -102,7 +102,8 @@ with tab_sim:
         with st.spinner(t("cfg_generating")):
             os.makedirs("data", exist_ok=True)
             df = generate_dataset(config=config, schema=schema, seed=int(seed))
-            df.to_csv("data/hr_dataset.csv", index=False)
+            st.session_state["df_train_raw"] = df
+    # df.to_csv("data/hr_dataset.csv", index=False)  # solo locale
             st.session_state.df_train = df
             st.session_state.dataset_config = config
         st.success(f"{t('cfg_gen_success')}: **{len(df)} {t('anl_kpi_employees').lower()}** | Churn rate: **{df['churn_label'].mean():.1%}**")
@@ -140,7 +141,8 @@ with tab_csv:
                 if is_valid:
                     df_clean = impute_missing(df_upload)
                     os.makedirs("data", exist_ok=True)
-                    df_clean.to_csv("data/hr_dataset.csv", index=False)
+                    st.session_state["df_train_raw"] = df_clean
+                    # df_clean.to_csv("data/hr_dataset.csv", index=False)  # solo locale
                     st.session_state.df_train = df_clean
                     st.success(f"✓ {len(df_clean)} {t('anl_scored_success')}")
                     st.dataframe(df_clean.head(), width="stretch", hide_index=True)
@@ -253,7 +255,7 @@ s1, s2, s3 = st.columns(3)
 with s1:
     if "df_train" in st.session_state and st.session_state.df_train is not None:
         st.success(f"{t('cfg_dataset_ready')} — {len(st.session_state.df_train)} {t('anl_kpi_employees').lower()}")
-    elif os.path.exists("data/hr_dataset.csv"):
+    elif (st.session_state.get("df_train_raw") is not None or os.path.exists("data/hr_dataset.csv")):
         df_t = pd.read_csv("data/hr_dataset.csv")
         st.session_state.df_train = df_t
         st.success(f"{t('cfg_dataset_ready')} — {len(df_t)} {t('anl_kpi_employees').lower()}")
@@ -264,5 +266,5 @@ with s2:
     if n_cust > 0: st.info(f"🧩 {n_cust} {t('cfg_custom_n')}")
     else: st.info(t("cfg_no_custom_info"))
 with s3:
-    if os.path.exists("models/churn_model.pkl"): st.success(t("cfg_model_ready"))
+    if (st.session_state.get("training_artifacts") is not None or os.path.exists("models/churn_model.pkl")): st.success(t("cfg_model_ready"))
     else: st.warning(t("go_to_training"))

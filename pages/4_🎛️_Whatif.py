@@ -66,11 +66,13 @@ st.markdown(f"<p style='color:#6b7280;'>{t('wif_sub')}</p>", unsafe_allow_html=T
 if not artifacts:
     st.error(t("no_model_error"))
     st.stop()
-if not os.path.exists("data/hr_scored.csv"):
+if not (st.session_state.get("df_scored") is not None or os.path.exists("data/hr_scored.csv")):
     st.error(t("no_scored_error"))
     st.stop()
 
-df_scored = pd.read_csv("data/hr_scored.csv")
+df_scored = st.session_state.get("df_scored")
+if df_scored is None and os.path.exists("data/hr_scored.csv"):
+    df_scored = pd.read_csv("data/hr_scored.csv")
 st.markdown("---")
 
 def rescore_employee(emp_dict):

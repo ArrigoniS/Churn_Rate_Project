@@ -112,7 +112,8 @@ with st.sidebar:
             with st.spinner(t("anl_generating")):
                 df_test   = generate_dataset(config={"n_employees":n_test,"churn_rate_target":0.30}, schema=schema, seed=int(test_seed))
                 df_scored = score_dataframe(df_test)
-                df_scored.to_csv("data/hr_scored.csv", index=False)
+                st.session_state["df_scored"] = df_scored
+                # df_scored.to_csv("data/hr_scored.csv", index=False)  # solo locale
                 st.session_state.df_scored = df_scored
                 st.success(f"✓ {n_test} {t('anl_gen_success')}")
     else:
@@ -126,7 +127,8 @@ with st.sidebar:
                 if is_valid:
                     df_clean  = impute_missing(df_upload)
                     df_scored = score_dataframe(df_clean)
-                    df_scored.to_csv("data/hr_scored.csv", index=False)
+                    st.session_state["df_scored"] = df_scored
+                # df_scored.to_csv("data/hr_scored.csv", index=False)  # solo locale
                     st.session_state.df_scored = df_scored
                     st.success(f"✓ {len(df_scored)} {t('anl_scored_success')}")
             except Exception as ex:
@@ -137,8 +139,10 @@ with st.sidebar:
     if df_scored is None:
         if "df_scored" in st.session_state and st.session_state.df_scored is not None:
             df_scored = st.session_state.df_scored
-        elif os.path.exists("data/hr_scored.csv"):
-            df_scored = pd.read_csv("data/hr_scored.csv")
+        elif (st.session_state.get("df_scored") is not None or os.path.exists("data/hr_scored.csv")):
+            df_scored = st.session_state.get("df_scored")
+            if df_scored is None and os.path.exists("data/hr_scored.csv"):
+                df_scored = pd.read_csv("data/hr_scored.csv")
             st.session_state.df_scored = df_scored
 
     st.markdown("---")
